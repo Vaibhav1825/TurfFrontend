@@ -1,13 +1,78 @@
-import React from 'react';
+import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import Section from './Section';
 import { BottomLine } from './design/Hero';
 
 const Registration = () => {
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        password: '',
+        reenterPassword: '',
+        phoneNo: ''
+    });
+
+    const [errors, setErrors] = useState({});
+    const [message, setMessage] = useState('');
+    const navigate = useNavigate(); // Initialize useNavigate
+
+    const { name, email, password, reenterPassword, phoneNo } = formData;
+
+    const onChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const validateForm = () => {
+        const newErrors = {};
+
+        // Validate name
+        if (name.length < 4) {
+            newErrors.name = 'Name must be at least 4 characters long';
+        }
+
+        // Validate password
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!passwordRegex.test(password)) {
+            newErrors.password = 'Password must be at least 8 characters long and include uppercase, lowercase, number, and special character';
+        }
+
+        // Check if passwords match
+        if (password !== reenterPassword) {
+            newErrors.reenterPassword = 'Passwords do not match';
+        }
+
+        return newErrors;
+    };
+
+    const onSubmit = async (e) => {
+        e.preventDefault();
+
+        const validationErrors = validateForm();
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            setMessage('');
+            return;
+        }
+
+        try {
+            const res = await axios.post('http://localhost:8080/users/signup', {
+                name,
+                email,
+                password,
+                phoneNo
+            });
+
+            setMessage(res.data.msg);
+            navigate('/'); 
+        } catch (err) {
+            setMessage(err.response?.data?.msg || 'Server error');
+        }
+    };
+
     return (
         <>
-            <Section
-                crosses
-            >
+            <Section crosses>
                 <div className="container relative z-2 max-w-[68rem] m-auto lg:flex lg:justify-between">
                     <div className="max-w-[32.875rem] mx-auto mb-12 text-center md:mb-16 lg:flex lg:flex-col lg:justify-around lg:max-w-[23.75rem] lg:m-0 lg:text-left">
                         <h2 className="h2">Join the AI revolution with Brainwave</h2>
@@ -15,35 +80,66 @@ const Registration = () => {
                     </div>
                     <form
                         className="relative max-w-[23.5rem] mx-auto p-0.25 bg-conic-gradient rounded-3xl lg:flex-1 lg:max-w-[27.5rem] lg:m-0 xl:mr-12"
-                        action="">
+                        onSubmit={onSubmit}
+                    >
                         <div className="px-9 py-10 bg-n-8 rounded-[1.4375rem] lg:px-16 lg:py-[3.25rem]">
                             <div className="relative mb-4 lg:mb-5">
                                 <input
-                                    className="w-full h-14 pl-12 bg-transparent border-b border-n-1/15 font-light placeholder:text-n-4 outline-none transition-colors focus:border-n-1/30"
-                                    placeholder="Name" type="text" />
+                                    className={`w-full h-14 pl-12 bg-transparent border-b ${errors.name ? 'border-red-500' : 'border-n-1/15'} font-light placeholder:text-n-4 outline-none transition-colors`}
+                                    placeholder="Name"
+                                    type="text"
+                                    name="name"
+                                    value={name}
+                                    onChange={onChange}
+                                />
+                                {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
                             </div>
                             <div className="relative mb-4 lg:mb-5">
                                 <input
-                                    className="w-full h-14 pl-12 bg-transparent border-b border-n-1/15 font-light placeholder:text-n-4 outline-none transition-colors focus:border-n-1/30"
-                                    placeholder="Email" type="email" />
+                                    className="w-full h-14 pl-12 bg-transparent border-b border-n-1/15 font-light placeholder:text-n-4 outline-none transition-colors"
+                                    placeholder="Email"
+                                    type="email"
+                                    name="email"
+                                    value={email}
+                                    onChange={onChange}
+                                />
                             </div>
                             <div className="relative mb-4 lg:mb-5">
                                 <input
-                                    className="w-full h-14 pl-12 bg-transparent border-b border-n-1/15 font-light placeholder:text-n-4 outline-none transition-colors focus:border-n-1/30"
-                                    placeholder="Password" type="password" />
+                                    className={`w-full h-14 pl-12 bg-transparent border-b ${errors.password ? 'border-red-500' : 'border-n-1/15'} font-light placeholder:text-n-4 outline-none transition-colors`}
+                                    placeholder="Password"
+                                    type="password"
+                                    name="password"
+                                    value={password}
+                                    onChange={onChange}
+                                />
+                                {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
                             </div>
                             <div className="relative mb-4 lg:mb-5">
                                 <input
-                                    className="w-full h-14 pl-12 bg-transparent border-b border-n-1/15 font-light placeholder:text-n-4 outline-none transition-colors focus:border-n-1/30"
-                                    placeholder="Re-enter Password" type="password" />
+                                    className={`w-full h-14 pl-12 bg-transparent border-b ${errors.reenterPassword ? 'border-red-500' : 'border-n-1/15'} font-light placeholder:text-n-4 outline-none transition-colors`}
+                                    placeholder="Re-enter Password"
+                                    type="password"
+                                    name="reenterPassword"
+                                    value={reenterPassword}
+                                    onChange={onChange}
+                                />
+                                {errors.reenterPassword && <p className="text-red-500 text-sm">{errors.reenterPassword}</p>}
                             </div>
                             <div className="relative mb-4 lg:mb-5">
                                 <input
-                                    className="w-full h-14 pl-12 bg-transparent border-b border-n-1/15 font-light placeholder:text-n-4 outline-none transition-colors focus:border-n-1/30"
-                                    placeholder="Phone Number" type="tel" />
+                                    className="w-full h-14 pl-12 bg-transparent border-b border-n-1/15 font-light placeholder:text-n-4 outline-none transition-colors"
+                                    placeholder="phoneNo Number"
+                                    type="tel"
+                                    name="phoneNo"
+                                    value={phoneNo}
+                                    onChange={onChange}
+                                />
                             </div>
                             <button
-                                className="button relative inline-flex items-center justify-center h-11 px-7 text-n-8 transition-colors hover:text-color-1 w-full">
+                                className="button relative inline-flex items-center justify-center h-11 px-7 text-n-8 transition-colors hover:text-color-1 w-full"
+                                type="submit"
+                            >
                                 <span className="relative z-10">Register</span>
                                 <svg className="absolute top-0 left-0" width="21" height="44" viewBox="0 0 21 44">
                                     <path fill="white" stroke="white" strokeWidth="2"
@@ -60,6 +156,7 @@ const Registration = () => {
                                     </path>
                                 </svg>
                             </button>
+                            {message && <div className="mt-6 text-sm text-red-500">{message}</div>}
                             <div className="mt-6 flex justify-between items-center text-sm text-n-4">
                                 <a href="#" className="hover:text-color-1">Already have an account? Sign in</a>
                             </div>

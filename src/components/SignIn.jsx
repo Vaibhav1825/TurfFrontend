@@ -1,14 +1,41 @@
-import React from 'react';
-import { heroBackground } from "../assets";
+import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import Section from './Section';
-import { BottomLine } from './design/Hero';
 
 const SignIn = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [errors, setErrors] = useState({});
+    const [message, setMessage] = useState('');
+    const navigate = useNavigate();
+
+    const onSubmit = async (e) => {
+        e.preventDefault();
+        try {
+
+            const res = await axios.post('http://localhost:8080/users/signin', { email, password });
+            sessionStorage.setItem('User', JSON.stringify(res.data.user));
+            sessionStorage.setItem('jwt', JSON.stringify(res.data.jwt));
+
+            sessionStorage.setItem('isLoggedIn', 'true')
+            console.log("is login");
+            navigate('/');
+            setMessage(res.data.msg);
+        } catch (err) {
+            // Handle errors
+            if (err.response) {
+                setErrors(err.response.data.errors || {});
+                setMessage(err.response.data.msg || 'Server error');
+            } else {
+                setMessage('Network error');
+            }
+        }
+    };
+
     return (
         <>
-            <Section
-                crosses
-            >
+            <Section crosses>
                 <div className="container relative z-2 max-w-[68rem] m-auto lg:flex lg:justify-between">
                     <div className="max-w-[32.875rem] mx-auto mb-12 text-center md:mb-16 lg:flex lg:flex-col lg:justify-around lg:max-w-[23.75rem] lg:m-0 lg:text-left">
                         <h2 className="h2">Join the AI revolution with Brainwave</h2>
@@ -16,20 +43,33 @@ const SignIn = () => {
                     </div>
                     <form
                         className="relative max-w-[23.5rem] mx-auto p-0.25 bg-conic-gradient rounded-3xl lg:flex-1 lg:max-w-[27.5rem] lg:m-0 xl:mr-12"
-                        action="">
+                        onSubmit={onSubmit}
+                    >
                         <div className="px-9 py-10 bg-n-8 rounded-[1.4375rem] lg:px-16 lg:py-[3.25rem]">
                             <div className="relative mb-4 lg:mb-5">
                                 <input
-                                    className="w-full h-14 pl-12 bg-transparent border-b border-n-1/15 font-light placeholder:text-n-4 outline-none transition-colors focus:border-n-1/30"
-                                    placeholder="Email" type="text" />
+                                    className={`w-full h-14 pl-12 bg-transparent border-b ${errors.email ? 'border-red-500' : 'border-n-1/15'} font-light placeholder:text-n-4 outline-none transition-colors focus:border-n-1/30`}
+                                    placeholder="Email"
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                />
+                                {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
                             </div>
                             <div className="relative mb-4 lg:mb-5">
                                 <input
-                                    className="w-full h-14 pl-12 bg-transparent border-b border-n-1/15 font-light placeholder:text-n-4 outline-none transition-colors focus:border-n-1/30"
-                                    placeholder="Password" type="password" />
+                                    className={`w-full h-14 pl-12 bg-transparent border-b ${errors.password ? 'border-red-500' : 'border-n-1/15'} font-light placeholder:text-n-4 outline-none transition-colors focus:border-n-1/30`}
+                                    placeholder="Password"
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                />
+                                {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
                             </div>
                             <button
-                                className="button relative inline-flex items-center justify-center h-11 px-7 text-n-8 transition-colors hover:text-color-1 w-full">
+                                className="button relative inline-flex items-center justify-center h-11 px-7 text-n-8 transition-colors hover:text-color-1 w-full"
+                                type="submit"
+                            >
                                 <span className="relative z-10">Sign in</span>
                                 <svg className="absolute top-0 left-0" width="21" height="44" viewBox="0 0 21 44">
                                     <path fill="white" stroke="white" strokeWidth="2"
@@ -88,4 +128,4 @@ const SignIn = () => {
     );
 }
 
-export default SignIn
+export default SignIn;

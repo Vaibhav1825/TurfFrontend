@@ -58,8 +58,8 @@ export const navigation = [
   },
   {
     id: "1",
-    title: "Pricing",
-    url: "#pricing",
+    title: "Booking",
+    url: "/booking",
   },
   {
     id: "2",
@@ -69,18 +69,18 @@ export const navigation = [
   {
     id: "3",
     title: "sports",
-    url: "#roadmap",
+    url: "/sports",
   },
   {
     id: "4",
     title: "New account",
-    url: "#signup",
+    url: "/registration",
     onlyMobile: true,
   },
   {
     id: "5",
     title: "Sign in",
-    url: "#login",
+    url: "/signin",
     onlyMobile: true,
   },
 ];
@@ -309,6 +309,35 @@ export const benefits = [
     imageUrl: benefiteImg6,
   },
 ];
+
+
+export const sportsDetails = [
+  {
+    id: 1,
+    title: "Football",
+    description: "Experience the thrill of football with our top-notch facilities and equipment.",
+    imageUrl: "/path/to/football-image.jpg" // Replace with actual image path
+  },
+  {
+    id: 2,
+    title: "Basketball",
+    description: "Shoot some hoops in our state-of-the-art basketball courts designed for all skill levels.",
+    imageUrl: "/path/to/basketball-image.jpg" // Replace with actual image path
+  },
+  {
+    id: 3,
+    title: "Tennis",
+    description: "Play tennis on our well-maintained courts, suitable for both recreational and competitive play.",
+    imageUrl: "/path/to/tennis-image.jpg" // Replace with actual image path
+  },
+  {
+    id: 4,
+    title: "Swimming",
+    description: "Dive into our Olympic-sized swimming pools, perfect for laps, training, or leisure.",
+    imageUrl: "/path/to/swimming-image.jpg" // Replace with actual image path
+  }
+];
+
 
 export const socials = [
   {
